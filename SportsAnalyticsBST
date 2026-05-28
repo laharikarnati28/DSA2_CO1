@@ -1,0 +1,212 @@
+import java.util.Scanner;
+
+class AthleteNode {
+
+    int athleteId;
+    String athleteName;
+    int score;
+
+    AthleteNode left, right;
+
+    AthleteNode(int athleteId, String athleteName, int score) {
+
+        this.athleteId = athleteId;
+        this.athleteName = athleteName;
+        this.score = score;
+
+        left = right = null;
+    }
+}
+
+class SportsBST {
+
+    AthleteNode root;
+
+    // Insert Athlete
+    AthleteNode insert(AthleteNode root, int athleteId, String athleteName, int score) {
+
+        if (root == null) {
+            return new AthleteNode(athleteId, athleteName, score);
+        }
+
+        if (score < root.score) {
+            root.left = insert(root.left, athleteId, athleteName, score);
+        }
+
+        else {
+            root.right = insert(root.right, athleteId, athleteName, score);
+        }
+
+        return root;
+    }
+
+    // Inorder Traversal
+    void inorder(AthleteNode root) {
+
+        if (root != null) {
+
+            inorder(root.left);
+
+            System.out.println(
+                "Athlete ID: " + root.athleteId +
+                " -> Athlete: " + root.athleteName +
+                " -> Score: " + root.score
+            );
+
+            inorder(root.right);
+        }
+    }
+
+    // Search Athlete
+    AthleteNode search(AthleteNode root, int score) {
+
+        if (root == null || root.score == score) {
+            return root;
+        }
+
+        if (score < root.score) {
+            return search(root.left, score);
+        }
+
+        return search(root.right, score);
+    }
+
+    // Find Minimum Value Node
+    AthleteNode minValueNode(AthleteNode node) {
+
+        AthleteNode current = node;
+
+        while (current.left != null) {
+            current = current.left;
+        }
+
+        return current;
+    }
+
+    // Delete Athlete
+    AthleteNode delete(AthleteNode root, int score) {
+
+        if (root == null) {
+            return root;
+        }
+
+        if (score < root.score) {
+            root.left = delete(root.left, score);
+        }
+
+        else if (score > root.score) {
+            root.right = delete(root.right, score);
+        }
+
+        else {
+
+            if (root.left == null) {
+                return root.right;
+            }
+
+            else if (root.right == null) {
+                return root.left;
+            }
+
+            AthleteNode temp = minValueNode(root.right);
+
+            root.score = temp.score;
+            root.athleteId = temp.athleteId;
+            root.athleteName = temp.athleteName;
+
+            root.right = delete(root.right, temp.score);
+        }
+
+        return root;
+    }
+
+    // Count Athletes
+    int countAthletes(AthleteNode root) {
+
+        if (root == null) {
+            return 0;
+        }
+
+        return 1 + countAthletes(root.left) + countAthletes(root.right);
+    }
+}
+
+public class Main1 {
+
+    public static void main(String[] args) {
+
+        Scanner sc = new Scanner(System.in);
+
+        SportsBST bst = new SportsBST();
+
+        int n;
+
+        System.out.print("Enter Number of Athletes: ");
+        n = sc.nextInt();
+
+        // User Input
+        for (int i = 1; i <= n; i++) {
+
+            System.out.println("\nEnter Athlete " + i + " Details");
+
+            System.out.print("Enter Athlete ID: ");
+            int id = sc.nextInt();
+
+            sc.nextLine();
+
+            System.out.print("Enter Athlete Name: ");
+            String name = sc.nextLine();
+
+            System.out.print("Enter Athlete Score: ");
+            int score = sc.nextInt();
+
+            bst.root = bst.insert(bst.root, id, name, score);
+        }
+
+        // Display BST
+        System.out.println("\nBST Inorder Traversal:");
+
+        bst.inorder(bst.root);
+
+        // Search Operation
+        System.out.print("\nEnter Score to Search: ");
+        int searchScore = sc.nextInt();
+
+        AthleteNode found = bst.search(bst.root, searchScore);
+
+        if (found != null) {
+
+            System.out.println("\nAthlete Score " + searchScore + " Found");
+
+            System.out.println(
+                "Athlete ID: " + found.athleteId +
+                " -> Athlete: " + found.athleteName +
+                " -> Score: " + found.score
+            );
+        }
+
+        else {
+            System.out.println("\nAthlete Not Found");
+        }
+
+        // Delete Operation
+        System.out.print("\nEnter Score to Delete: ");
+        int deleteScore = sc.nextInt();
+
+        System.out.println("\nDeleting Athlete Score " + deleteScore + "...");
+
+        bst.root = bst.delete(bst.root, deleteScore);
+
+        // Display After Deletion
+        System.out.println("\nBST After Deletion:");
+
+        bst.inorder(bst.root);
+
+        // Statistics
+        System.out.println("\nSports Statistics:");
+
+        System.out.println("Total Athletes = " + bst.countAthletes(bst.root));
+
+        sc.close();
+    }
+}
